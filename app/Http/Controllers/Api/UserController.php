@@ -44,20 +44,11 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $user = User::create([
-            'name' => $request->name,
-            'role_id' => 2,
-            'email' => $request->email,
-            'telp' => $request->telp,
-            'image' => $request->image,
-            'password' => $request->password,
-        ], 200);
-
         return response()->json([
             'code' => 200,
             'status' => true,
             'message' => "Success stored a user",
-            'data' => $user
+            'data' => "STORE ACCOUNT MARKETPLACE BELUM READY MAZEEEEEEEEEEE"
         ], 200);
     }
 
