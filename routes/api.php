@@ -21,8 +21,6 @@ Route::post('/lazopauth', [\App\Http\Controllers\Market\Lazada\LazopController::
 
 // callback
 Route::get('/callback', [\App\Http\Controllers\Market\Lazada\LazopController::class, 'callbackAuth']);
-
-Route::post('/createtoken', [\App\Http\Controllers\Market\Lazada\LazopController::class, 'createToken']);
 Route::post('/refreshtoken', [\App\Http\Controllers\Market\Lazada\LazopController::class, 'resfreshToken']);
 
 Route::middleware('auth:sanctum')->group(function () {

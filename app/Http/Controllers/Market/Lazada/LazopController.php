@@ -14,7 +14,6 @@ class LazopController extends Controller
     private $lazadaUrl = "https://api.lazada.com.my/rest";
     private $apiKey = "108666";
     private $apiSecret = "4A7V4bhW9XBrZuCWrq8nOl540ibyxJms";
-    private $code;
 
     public function lazadaAuth(Request $request){        
         //https://auth.lazada.com/oauth/authorize?response_type=code&force_auth=true&redirect_uri=${app call back url}&client_id=${appkey}
@@ -29,16 +28,20 @@ class LazopController extends Controller
         $client_id = $request->client_id;
         $response = Http::get("https://auth.lazada.com/oauth/authorize?response_type=code&force_auth=true&redirect_uri=${redirect_uri}&client_id=${client_id}&redirect_auth=true");
         return $response;
-    }
-    public function createToken(){                        
+    }    
+    
+    public function callbackAuth(Request $request){
+        $code = $request->code;
+
         $lazOp = new LazopClient($this->lazadaUrl, $this->apiKey, $this->apiSecret);
         $lazRequest = new LazopRequest('/auth/token/create');
         // Request Params
-        $lazRequest->addApiParam('code', $this->code);
+        $lazRequest->addApiParam('code', $code);
         // Process API 
         $response = $lazOp->execute($lazRequest); // JSON response
         return $response;
     }
+
     public function refreshToken(Request $request){
         $validator = Validator::make($request->all(), [
             'token' => 'required',            
@@ -51,14 +54,5 @@ class LazopController extends Controller
         $lazRequest = new LazopRequest('/auth/token/refresh');
         $lazRequest->addApiParam('refresh_token',$request->token);
         var_dump($lazOp->execute($lazRequest));
-    }
-
-    public function callbackAuth(Request $request){
-        $this->code = $request->code;
-        return response()->json([
-            'code' => 200,
-            'data' => $request->code,            
-            'message' => 'Succes add code to system'
-        ], 200);
     }
 }
