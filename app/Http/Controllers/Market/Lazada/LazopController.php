@@ -39,7 +39,19 @@ class LazopController extends Controller
         $lazRequest->addApiParam('code', $code);
         // Process API 
         $response = $lazOp->execute($lazRequest); // JSON response
-        return $response;
+
+        // handling access token
+        $hasil = json_decode($response);        
+        $user_id = $hasil->country_user_info[0]->user_id;
+        $country = $hasil->country_user_info[0]->country;
+        $access_token = $hasil->access_token;
+
+        $data = array(
+            'user_id' => $user_id,
+            'country' => $country,
+            'access_token' => $access_token,
+        );
+        return json_encode($data);
     }
 
     public function refreshToken(Request $request){
