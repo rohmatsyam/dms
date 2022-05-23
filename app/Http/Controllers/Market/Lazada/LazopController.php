@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Lazada\LazopClient;
 use Lazada\LazopRequest;
 
@@ -23,25 +24,25 @@ class LazopController extends BaseController
     }
     public function lazadaAuth(){
         $user_id = Auth::user()->id;        
-        $seller = SellerLazada::where('user_id',$user_id)->first()->toArray();        
+        $seller = DB::table('seller_lazadas')->where('user_id',$user_id)->first();        
         if(!empty($seller)){            
-            $token_expires_at = $this->convertDate($seller['token_expires_at']);
-            $refresh_expires_at = $this->convertDate($seller['refresh_expires_at']);
+            $token_expires_at = $this->convertDate($seller->token_expires_at);
+            $refresh_expires_at = $this->convertDate($seller->refresh_expires_at);
             $now = Carbon::now()->format('Y/m/d');            
             if($now < $token_expires_at){
-                return $this->sendResponse(data:$seller['access_token'],message:"Access token is available, valid until ".Carbon::parse($token_expires_at)->diffForHumans());
+                return $this->sendResponse(data:$seller->access_token,message:"Access token is available, valid until ".Carbon::parse($token_expires_at)->diffForHumans());
             }else{
                 if($now < $refresh_expires_at){
                     // refresh access token
                     $lazOp = new LazopClient($this->lazadaUrl, env('LAZADA_KEY'), env('LAZADA_SECRET'));
                     $lazRequest = new LazopRequest('/auth/token/refresh');
-                    $lazRequest->addApiParam('refresh_token',$seller['refresh_token']);
+                    $lazRequest->addApiParam('refresh_token',$seller->refresh_token);
                     $response = $lazOp->execute($lazRequest);
                     $hasil = json_decode($response);                                                
                     $access_token = $hasil->access_token;
                     $token_expires_at = Carbon::now()->addDays(7)->format('Y-m-d');                    
                     $refresh_token = $hasil->refresh_token;                    
-                    SellerLazada::where('seller_id',$seller['seller_id'])->first()->update([                        
+                    SellerLazada::where('seller_id',$seller->seller_id)->update([                        
                         'access_token' => $access_token,
                         'token_expires_at' => $token_expires_at,
                         'refresh_token' => $refresh_token,                
