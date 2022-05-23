@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
     public function register(Request $request)
     {
@@ -70,16 +71,10 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'code' => 422,
-                'message' => 'wrong username or password'
-            ], 422);
+            return $this->sendError("",message:"wrong username or password");            
         }
-
         $user = User::where('email', $request['email'])->firstOrFail();
-
         $token = $user->createToken($request->email)->plainTextToken;
-
         return response()->json([
             'code' => 200,
             'data' => $user,
@@ -94,9 +89,6 @@ class AuthController extends Controller
             $token->delete();
         });
 
-        return response()->json([
-            'code' => 200,
-            'message' => 'Succes logout from system'
-        ]);
+        return $this->sendResponse("","Succes logout from system");        
     }
 }
