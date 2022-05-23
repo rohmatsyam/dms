@@ -58,6 +58,7 @@ class LazopController extends Controller
     }    
     
     public function callbackAuth(Request $request){
+        dd(Auth::user()->id);
         $code = $request->code;        
         $lazOp = new LazopClient($this->lazadaUrl, env('LAZADA_KEY'), env('LAZADA_SECRET'));
         $lazRequest = new LazopRequest('/auth/token/create');
