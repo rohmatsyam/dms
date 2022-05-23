@@ -19,8 +19,7 @@ Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'regi
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
 
 // callback
-$userId = Auth::user()->id;
-Route::get('/callback', [\App\Http\Controllers\Market\Lazada\LazopController::class, 'callbackAuth'])->setParameter($userId,$userId);
+Route::get('/callback', [\App\Http\Controllers\Market\Lazada\LazopController::class, 'callbackAuth']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource("/role", App\Http\Controllers\Api\RoleController::class)->middleware('isAdmin');
